@@ -59,3 +59,7 @@ For example to adjust this on Windows using Docker Desktop on wsl2 do
 wsl -d docker-desktop
 sysctl -w vm.max_map_count=262144
 ```
+
+## References
+
+- [Fluentd EFK Stack Howto](https://docs.fluentd.org/container-deployment/docker-compose), [uken/fluent-plugin-elasticsearch](https://github.com/uken/fluent-plugin-elasticsearch)

@@ -1,5 +1,13 @@
 version: "3.7"
 
+x-service-base: &service
+  logging:
+    driver: "fluentd"
+    options:
+      fluentd-address: localhost:24224
+  # https://docs.docker.com/compose/compose-file/#restart
+  restart: ${DOCKER_RESTART:-unless-stopped}
+
 # https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html#docker-compose-file
 x-elastic-base: &elastic_base
   image: ${ELK_REGISTRY}/elasticsearch/elasticsearch:${ELK_VERSION}
@@ -7,11 +15,9 @@ x-elastic-base: &elastic_base
     memlock:
       soft: -1
       hard: -1
-  networks:
-    - elastic
     #---
   logging:
-    driver: "json-file"
+    driver: "json-file" # TODO: fluentd
     options:
       max-size: "3m"
       max-file: "1"
@@ -42,12 +48,21 @@ services:
     #   - ./kibana/config/kibana.yml:/usr/share/kibana/config/kibana.yml
     #environment: # https://www.elastic.co/guide/en/kibana/current/docker.html#docker-defaults
     #ELASTICSEARCH_HOSTS: http://elasticsearch.example.org
-    networks:
-      - elastic
     ports:
       - 5601:5601
 
-  #--- es 3-node cluster
+  #--- fluentd
+  # - https://docs.fluentd.org/container-deployment/docker-compose
+  fluentd: # https://hub.docker.com/r/fluent/fluentd
+    build:
+      context: ./fluentd
+    ports:
+      - 24224:24224
+      - 24224:24224/udp
+    volumes:
+      - ./fluentd/conf/:/fluentd/etc/
+
+  #--- es 3-node cluster -------------------------
   es01:
     <<: *elastic_base
     container_name: es01
@@ -90,7 +105,3 @@ volumes:
     driver: local
   es-data03:
     driver: local
-
-networks:
-  elastic:
-    driver: bridge
