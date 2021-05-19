@@ -1,0 +1,96 @@
+version: "3.7"
+
+# https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html#docker-compose-file
+x-elastic-base: &elastic_base
+  image: ${ELK_REGISTRY}/elasticsearch/elasticsearch:${ELK_VERSION}
+  ulimits:
+    memlock:
+      soft: -1
+      hard: -1
+  networks:
+    - elastic
+    #---
+  logging:
+    driver: "json-file"
+    options:
+      max-size: "3m"
+      max-file: "1"
+  # https://docs.docker.com/compose/compose-file/#restart
+  restart: ${DOCKER_RESTART:-unless-stopped}
+
+x-elastic-env: &elastic_env
+  cluster.name: es-docker-cluster
+  bootstrap.memory_lock: "true"
+  ES_JAVA_OPTS: "-Xms512m -Xmx512m"
+
+services:
+  #--- es single node
+  elasticsearch:
+    <<: *elastic_base
+    environment:
+      <<: *elastic_env
+      discovery.type: single-node
+    volumes:
+      - es-data:/usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
+
+  #--- kibana
+  kibana:
+    image: ${ELK_REGISTRY}/kibana/kibana:${ELK_VERSION}
+    # volumes:
+    #   - ./kibana/config/kibana.yml:/usr/share/kibana/config/kibana.yml
+    #environment: # https://www.elastic.co/guide/en/kibana/current/docker.html#docker-defaults
+    #ELASTICSEARCH_HOSTS: http://elasticsearch.example.org
+    networks:
+      - elastic
+    ports:
+      - 5601:5601
+
+  #--- es 3-node cluster
+  es01:
+    <<: *elastic_base
+    container_name: es01
+    environment:
+      <<: *elastic_env
+      node.name: es01
+      cluster.initial_master_nodes: es01,es02,es03
+      discovery.seed_hosts: es02,es03
+    volumes:
+      - es-data01:/usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
+  es02:
+    <<: *elastic_base
+    container_name: es02
+    environment:
+      <<: *elastic_env
+      node.name: es02
+      cluster.initial_master_nodes: es01,es02,es03
+      discovery.seed_hosts: es01,es03
+    volumes:
+      - es-data02:/usr/share/elasticsearch/data
+  es03:
+    <<: *elastic_base
+    container_name: es03
+    environment:
+      <<: *elastic_env
+      node.name: es03
+      cluster.initial_master_nodes: es01,es02,es03
+      discovery.seed_hosts: es01,es02
+    volumes:
+      - es-data03:/usr/share/elasticsearch/data
+
+volumes:
+  es-data:
+    driver: local
+  es-data01:
+    driver: local
+  es-data02:
+    driver: local
+  es-data03:
+    driver: local
+
+networks:
+  elastic:
+    driver: bridge
