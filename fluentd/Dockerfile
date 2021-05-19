@@ -3,5 +3,6 @@
 FROM fluent/fluentd:edge
 
 USER root
-RUN ["gem", "install", "fluent-plugin-elasticsearch", "--no-document", "--version", "4.3.3"]
+# https://rubygems.org/gems/fluent-plugin-elasticsearch/
+RUN ["gem", "install", "fluent-plugin-elasticsearch", "--no-document", "--version", "5.0.3"]
 USER fluent
