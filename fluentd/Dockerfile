@@ -1,8 +1,8 @@
 #
-# fluent/fluentd:v1.12.0-debian-1.0
-FROM fluent/fluentd:edge
+ARG FLUENTD_VERSION=v1.12.2-debian-1.0
+FROM fluent/fluentd:${FLUENTD_VERSION}
 
 USER root
 # https://rubygems.org/gems/fluent-plugin-elasticsearch/
-RUN ["gem", "install", "fluent-plugin-elasticsearch", "--no-document", "--version", "5.0.3"]
+RUN ["gem", "install", "--no-document", "fluent-plugin-elasticsearch:5.0.3"]
 USER fluent

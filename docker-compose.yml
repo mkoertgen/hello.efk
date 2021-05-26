@@ -54,8 +54,11 @@ services:
   #--- fluentd
   # - https://docs.fluentd.org/container-deployment/docker-compose
   fluentd: # https://hub.docker.com/r/fluent/fluentd
+    image: awesomeinc/fluentd-elasticsearch:${FLUENTD_VERSION}
     build:
       context: ./fluentd
+      args:
+        FLUENTD_VERSION: ${FLUENTD_VERSION}
     ports:
       - 24224:24224
       - 24224:24224/udp
