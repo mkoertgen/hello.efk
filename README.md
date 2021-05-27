@@ -21,7 +21,7 @@ To startup a 3-node elasticsearch cluster
 ```shell
 $ docker compose up -d es01 es02 es03
 [+] Running 4/4
- - Network helloelk_default Created
+ - Network helloELASTIC_default Created
  - Container es03            Started
  - Container es01            Started
  - Container es02            Started

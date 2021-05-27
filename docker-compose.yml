@@ -10,7 +10,7 @@ x-service-base: &service
 
 # https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html#docker-compose-file
 x-elastic-base: &elastic_base
-  image: ${ELK_REGISTRY}/elasticsearch/elasticsearch:${ELK_VERSION}
+  image: ${ELASTIC_REGISTRY}/elasticsearch/elasticsearch:${ELASTIC_VERSION}
   ulimits:
     memlock:
       soft: -1
@@ -43,7 +43,7 @@ services:
 
   #--- kibana
   kibana:
-    image: ${ELK_REGISTRY}/kibana/kibana:${ELK_VERSION}
+    image: ${ELASTIC_REGISTRY}/kibana/kibana:${ELASTIC_VERSION}
     # volumes:
     #   - ./kibana/config/kibana.yml:/usr/share/kibana/config/kibana.yml
     #environment: # https://www.elastic.co/guide/en/kibana/current/docker.html#docker-defaults
