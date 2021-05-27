@@ -1,6 +1,6 @@
-# hello.elk
+# hello.efk
 
-Example blueprint for a minimal ELK-stack orchestrated using docker-compose.
+Example blueprint for a minimal EFK-stack orchestrated using docker-compose.
 
 ## Getting started
 
